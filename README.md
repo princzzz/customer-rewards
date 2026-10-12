@@ -14,27 +14,29 @@ month, with a total over the reporting period. Purchases are loaded from SQL, no
 ## Run
 
 Install a **JDK 17 or newer** and set `JAVA_HOME` to that JDK, not a Java 8 installation or a JRE.
-The Maven wrapper pins Maven 3.9.11, so installing Maven separately is unnecessary. The first build
-needs internet access to download Maven and dependencies.
+Install **Apache Maven 3.9 or newer** and add its `bin` directory to `PATH`. Run commands from the
+repository root, where `pom.xml` is located. The first build needs internet access to download
+dependencies.
 
-Windows PowerShell:
+Check the Java and Maven installations:
 
 ```powershell
-.\mvnw.cmd clean verify
-.\mvnw.cmd spring-boot:run
+java -version
+mvn -version
 ```
 
-Linux/macOS:
+Both commands must show Java 17 or newer. Build, test, and start the application on Windows,
+Linux, or macOS:
 
 ```bash
-./mvnw clean verify
-./mvnw spring-boot:run
+mvn clean verify
+mvn spring-boot:run
 ```
 
 The default URL is `http://localhost:8080/api/rewards`. If port 8080 is occupied:
 
 ```powershell
-.\mvnw.cmd spring-boot:run "-Dspring-boot.run.arguments=--server.port=8081"
+mvn spring-boot:run "-Dspring-boot.run.arguments=--server.port=8081"
 ```
 
 Alternatively, after building, run `java -jar target/customer-rewards-1.0.0.jar`.
@@ -176,8 +178,7 @@ The endpoint is read-only; additional purchase records can be supplied in SQL sc
 ```text
 customer-rewards/
 |-- pom.xml                              Dependencies, build, formatting gate
-|-- mvnw / mvnw.cmd / .mvn/               Pinned Maven wrapper
-|-- .github/workflows/build.yml           GitHub Actions build and tests
+|-- README.md                            Setup, API contract, implementation, and tests
 |-- src/main/java/com/example/rewards/
 |   |-- RewardsApplication.java          Bootstrap and injectable UTC clock
 |   |-- controller/                      REST request binding
@@ -204,15 +205,17 @@ uses explicit imports and Google Java formatting.
 ## Tests and Quality Checks
 
 ```powershell
-.\mvnw.cmd clean verify
-.\mvnw.cmd "-Dtest=RewardPointsCalculatorTest" test
-.\mvnw.cmd "-Dtest=RewardsServiceTest" test
-.\mvnw.cmd "-Dtest=RewardsIntegrationTest" test
-.\mvnw.cmd spotless:apply
-.\mvnw.cmd javadoc:javadoc
+mvn clean verify
+mvn "-Dtest=RewardPointsCalculatorTest" test
+mvn "-Dtest=RewardsServiceTest" test
+mvn "-Dtest=RewardsIntegrationTest" test
+mvn "-Dtest=RewardsControllerTest" test
+mvn spotless:apply
+mvn javadoc:javadoc
 ```
 
-Use `./mvnw` for the same commands on Linux/macOS.
+The same commands work on Windows, Linux, and macOS with Maven installed. `clean verify` runs
+the unit and integration tests, builds the executable application JAR, and checks Java formatting.
 
 - Calculator unit tests: tier boundaries, the $120 example, cents, zero, large values, null, negative.
 - Service unit tests: multiple customers (including duplicate names), multiple purchases, cross-year
@@ -229,12 +232,17 @@ purchases, repeated $60 purchases, and purchases immediately outside the reporti
 test fixtures are separate from the date-relative production demonstration data.
 
 Surefire reports are generated under `target/surefire-reports`. Generated Javadocs are under
-`target/reports/apidocs`. GitHub Actions runs `clean verify` on pushes and pull requests.
+`target/reports/apidocs`. Run `mvn clean verify` locally before submitting changes.
 
 ## Submission and Scope
 
-Submit the GitHub source repository, not an archive. `.gitignore` excludes `target/`, `bin/`, local
-tools, logs, and IDE settings. The Maven wrapper is script-only; no wrapper JAR or ZIP is committed.
+The submitted project consists of the `src/` folder, `pom.xml`, and this `README.md`. These contain
+the application, SQL scripts, unit and integration tests, build configuration, and documentation.
+An installed JDK and Maven are sufficient to build and run the project.
+
+Submit the GitHub source repository, not a ZIP or other archive. Maven generates the `target/`
+directory locally during a build; do not upload it. Also exclude `bin/`, logs, local tools, IDE
+settings, and the local `.git/` directory from browser uploads.
 
 This is a focused assignment demonstration, not an authenticated production customer-data service.
 A production deployment would require access control, a persistent database with migrations,
