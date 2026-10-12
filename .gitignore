@@ -1,0 +1,8 @@
+/target/
+/bin/
+/.tools/
+/.idea/
+/.vscode/
+*.iml
+*.log
+.DS_Store
